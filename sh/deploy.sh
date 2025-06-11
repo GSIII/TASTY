@@ -1,6 +1,6 @@
 #!/bin/bash
 
-cd TASTY
+cd /work/TASTY
 
 git pull;
 

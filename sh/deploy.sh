@@ -17,4 +17,6 @@ source .venv/bin/activate
 
 pip install -r requirements.txt
 
+ps -ef | grep streamlit | grep -v grep | awk '{print $2}' | xargs kill -9
+
 streamlit run app.py

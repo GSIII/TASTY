@@ -1,7 +1,5 @@
 #!/bin/bash
 
-cd /work/TASTY
-
 git pull;
 
 SRC=/work/TASTY/ai

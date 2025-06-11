@@ -7,7 +7,7 @@ import io
 
 # --- OpenAI API 키 설정 ---
 try:
-    openai.api_key = os.environ["OPENAI_API_KEY"]
+    openai.api_key = st.secrets["OPENAI_API_KEY"]
 except KeyError:
     st.error("OpenAI API 키를 찾을 수 없습니다. 환경 변수에 OPENAI_API_KEY를 설정해주세요.")
 

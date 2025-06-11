@@ -56,7 +56,7 @@ def analyze_image(image_bytes):
 
 
 # --- Streamlit UI ---
-st.title("🤖 AI 음식 이름 판독기")
+st.title("🤖 AI 음식 이름 판독기!!!!!!!!!!!!")
 st.write("음식 사진을 올려주시면 AI가 어떤 음식인지 알려드립니다!")
 
 uploaded_file = st.file_uploader("이미지 파일을 선택하세요.", type=["jpg", "jpeg", "png"])

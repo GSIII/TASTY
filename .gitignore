@@ -1,0 +1,29 @@
+## env
+.env
+
+## nodejs
+node/**/node_modules
+node/**/package-lock.json
+node/**/.serverless
+
+## python
+.idea
+secret.json
+**/.venv
+**/__pycache__/
+**/secret.json
+**/*.mp4
+**/*.mp3
+
+**/model.safetensors
+**/llama.cpp
+**/*.gguf
+**/training_data
+**/sft.json
+**/finetuned-*
+
+## docker
+docker/mysql/mysql*
+docker/mongodb/mongo*
+
+**/.webui_secret_key

@@ -7,7 +7,7 @@ import io
 
 # --- OpenAI API 키 설정 ---
 try:
-    openai.api_key = st.secrets["OPENAI_API_KEY"]
+    openai.api_key = os.getenv("OPENAI_API_KEY")
 except KeyError:
     st.error("OpenAI API 키를 찾을 수 없습니다. 환경 변수에 OPENAI_API_KEY를 설정해주세요.")
 
@@ -63,7 +63,7 @@ uploaded_file = st.file_uploader("이미지 파일을 선택하세요.", type=["
 
 if uploaded_file is not None:
     image = Image.open(uploaded_file)
-    st.image(image, caption="업로드된 이미지", use_container_width=True)
+    st.image(image, caption="업로드된 이미지")
 
     if st.button("음식 이름 분석하기"):
         with st.spinner("AI가 이미지를 분석하고 있습니다... 잠시만 기다려주세요."):

@@ -12,6 +12,7 @@ jobs:
           username: ${{ secrets.USERNAME }}
           key: ${{ secrets.KEY }}
           port: ${{ secrets.PORT }}
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           script: |
             ./deploy.sh
+    env:
+      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}

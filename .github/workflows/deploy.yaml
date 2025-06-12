@@ -9,8 +9,9 @@ jobs:
         uses: appleboy/ssh-action@v0.1.10
         with:
           host: ${{ secrets.HOST }}
-          username: ${{ secrets.USERNAME}}
-          key: ${{ secrets.KEY}}
-          port: ${{ secrets.PORT}}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.KEY }}
+          port: ${{ secrets.PORT }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           script: |
             ./deploy.sh

@@ -13,7 +13,6 @@ cd $DEST/ai
 
 pids=$(ps -ef | grep streamlit | grep -v grep | awk '{print $2}')
 if [ -n "$pids" ]; then
-    echo "Killing existing Streamlit processes: $pids"
     kill -9 $pids
 fi
 
@@ -23,4 +22,4 @@ source .venv/bin/activate
 
 pip install -r requirements.txt
 
-streamlit run app.py
+streamlit run app.py --server.port=8501 &

@@ -2,6 +2,10 @@
 
 git pull;
 
+pkill -9 -f "streamlit run app.py"
+
+sleep 2
+
 SRC=/work/TASTY/ai
 DEST=/$HOME/deploy
 
@@ -10,11 +14,6 @@ mkdir -p $DEST
 cp -r $SRC $DEST
 
 cd $DEST/ai
-
-for pid in $(ps -ef | grep python | grep -v grep | awk '{print $2}'); do
-    echo "Killing process $pid"
-    kill -9 "$pid"
-done
 
 python -m venv .venv
 

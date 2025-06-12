@@ -7,10 +7,9 @@ import io
 
 # --- OpenAI API 키 설정 ---
 try:
-    openai.api_key = os.getenv("OPENAI_API_KEY")
+    api_key = st.secrets["OPENAI_API_KEY"]
 except KeyError:
-    st.error("OpenAI API 키를 찾을 수 없습니다. 환경 변수에 OPENAI_API_KEY를 설정해주세요.")
-
+    api_key = os.getenv("OPENAI_API_KEY")
 
 def preprocess_image(image: Image.Image, max_size=(512, 512), quality=85):
     """이미지를 리사이즈하고 압축한 후 바이트로 반환"""

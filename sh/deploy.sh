@@ -2,9 +2,10 @@
 
 git pull;
 
-pkill -9 -f "streamlit run app.py"
-
-sleep 2
+for pid in $(ps -ef | grep streamlit | grep -v grep | awk '{print $2}'); do
+    echo "Killing process $pid"
+    kill -9 "$pid"
+done
 
 SRC=/work/TASTY/ai
 DEST=/$HOME/deploy

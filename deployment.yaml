@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: food-detection-app
+  labels:
+    app: food-detection-app
+spec:
+  replicas: 1   
+  selector:
+    matchLabels:
+      app: food-detection-app
+  template:
+    metadata:
+      labels:
+        app: food-detection-app
+    spec:
+      containers:
+        - name: food-detection-app
+          image: gsiii/food-detector-app:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8501 
+          env:
+            - name: OPENAI_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: openai-api-key-secret
+                  key: OPENAI_API_KEY

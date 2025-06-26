@@ -71,14 +71,16 @@ if uploaded_file is not None:
     st.image(image, caption="업로드된 이미지")
 
 if st.button("음식 이름 분석하기"):
-    with st.spinner("AI가 이미지를 분석하고 있습니다..."):
-        resized_bytes = preprocess_image(image)
-        food_names_text = analyze_image(resized_bytes)
+    if uploaded_file is None:
+        st.error("먼저 이미지를 업로드해주세요.")
+    else:
+        with st.spinner("AI가 이미지를 분석하고 있습니다..."):
+            resized_bytes = preprocess_image(image)
+            food_names_text = analyze_image(resized_bytes)
 
-        # 공백 제거 + 빈 문자열 필터링
-        food_list = [item.strip() for item in food_names_text.split(",") if item.strip()]
+            food_list = [item.strip() for item in food_names_text.split(",") if item.strip()]
+            st.session_state.analyzed_foods = food_list
 
-        st.session_state.analyzed_foods = food_list
 
 # AI 분석 결과 음식들 표시 + 수정 버튼
 if "analyzed_foods" in st.session_state and st.session_state.analyzed_foods:

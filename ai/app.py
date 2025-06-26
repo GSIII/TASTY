@@ -15,18 +15,14 @@ except KeyError:
 SERVER_URL = "http://13.124.198.232:3000/register-meal"
 
 def preprocess_image(image: Image.Image, max_size=(512, 512), quality=85):
-    """이미지를 리사이즈하고 압축한 후 바이트로 반환"""
-    image.thumbnail(max_size)  # 비율 유지한 리사이즈
+    image.thumbnail(max_size)
     buffer = io.BytesIO()
     image.save(buffer, format="JPEG", quality=quality)
     buffer.seek(0)
     return buffer.read()
 
-
 def analyze_image(image_bytes):
-    """이미지 바이트를 받아 AI로 분석하고 음식 이름을 반환하는 함수"""
     base64_image = base64.b64encode(image_bytes).decode("utf-8")
-
     try:
         response = openai.chat.completions.create(
             model="gpt-4o",
@@ -52,13 +48,11 @@ def analyze_image(image_bytes):
                     ],
                 }
             ],
-            max_tokens=10,
+            max_tokens=50,
         )
-
         return response.choices[0].message.content
     except Exception as e:
         return f"분석 중 오류가 발생했습니다: {e}"
-
 
 # --- Streamlit UI ---
 st.title("🤖 AI 음식 이름 판독기")
@@ -81,47 +75,56 @@ if st.button("음식 이름 분석하기"):
             food_list = [item.strip() for item in food_names_text.split(",") if item.strip()]
             st.session_state.analyzed_foods = food_list
 
-
-# AI 분석 결과 음식들 표시 + 수정 버튼
+# --- AI 분석 결과 표시 및 수정/삭제/등록 ---
 if "analyzed_foods" in st.session_state and st.session_state.analyzed_foods:
-    st.subheader("AI 분석 결과")
+    st.write("---")
+    st.markdown(f"##### AI 분석 결과")    
     for food in st.session_state.analyzed_foods:
-        cols = st.columns([4, 1])
-        with cols[0]:
-            st.markdown(f"**{food}**")
-        with cols[1]:
-            if st.button("수정", key=f"edit_btn_{food}"):
-                st.session_state.edit_food = food
+        cols = st.columns([4, 2, 2, 3, 2, 2, 2])  # 이름, 수정, 삭제, 입력창, 아침, 점심, 저녁
 
-        # 수정 모드일 경우 텍스트 입력창 띄우기
         if st.session_state.get("edit_food") == food:
-            new_name = st.text_input("음식 이름 수정", value=food, key=f"edit_input_{food}")
-            if st.button("저장", key=f"save_btn_{food}"):
-                # 수정한 이름으로 교체
+            with cols[0]:
+                st.markdown(f"**{food}**")
+            new_name = cols[1].text_input("새 이름", value=food, key=f"ai_edit_input_{food}")
+            if cols[1].button("저장", key=f"ai_save_btn_{food}"):
                 idx = st.session_state.analyzed_foods.index(food)
                 st.session_state.analyzed_foods[idx] = new_name
                 st.session_state.edit_food = None
                 st.experimental_rerun()
+            cols[1].write("")
+            cols[2].write("")
+        else:
+            with cols[0]:
+                st.markdown(f"**🍽️ {food}**")
+            if cols[1].button("수정", key=f"ai_edit_btn_{food}"):
+                st.session_state.edit_food = food
+            if cols[2].button("삭제", key=f"ai_del_btn_{food}"):
+                st.session_state.analyzed_foods.remove(food)
+                if st.session_state.get("edit_food") == food:
+                    st.session_state.edit_food = None
+                st.experimental_rerun()
+            cols[3].write("")
 
-        # 등록 버튼 (수정 중 아닐 때만)
-        if st.session_state.get("edit_food") != food:
-            cols2 = st.columns(4)
-            for i, meal in enumerate(["아침", "점심", "저녁", "간식"]):
-                if cols2[i].button(f"{meal} 등록", key=f"{food}_{meal}"):
+            for i, meal in enumerate(["아침", "점심", "저녁"]):
+                if cols[4 + i].button(f"{meal}", key=f"ai_{food}_{meal}"):
                     try:
                         response = requests.post(SERVER_URL, json={"food_name": food, "meal_type": meal})
                         if response.status_code == 200:
                             st.success(f"'{food}'을(를) {meal}에 등록했습니다.")
+                        elif response.status_code == 400:
+                            detail = response.json().get("detail", "등록 실패")
+                            st.warning(f"{detail}")  # <-- 이미 등록된 음식입니다 같은 메시지 출력
                         else:
                             st.error(f"서버 오류: {response.status_code} - {response.text}")
                     except requests.exceptions.RequestException as e:
                         st.error(f"서버 요청 실패: {e}")
 
-
+# --- 수동 음식 추가 ---
 if "analyzed_foods" in st.session_state and st.session_state.analyzed_foods:
-
-    st.write("---")
-    st.write("📌 사진 속 음식이 없나요? 직접 추가하세요!")
+    # st.write("---")
+    st.write("")
+    st.write("")
+    st.markdown(f"##### 📌 사진 속 음식이 없나요? 직접 추가하세요!")
 
     if "manual_foods" not in st.session_state:
         st.session_state.manual_foods = []
@@ -130,22 +133,60 @@ if "analyzed_foods" in st.session_state and st.session_state.analyzed_foods:
         new_food = st.session_state.manual_food_input.strip()
         if new_food and new_food not in st.session_state.manual_foods:
             st.session_state.manual_foods.append(new_food)
-        st.session_state.manual_food_input = "" 
+        st.session_state.manual_food_input = ""
 
     st.text_input("음식 이름을 입력하세요.", key="manual_food_input", on_change=add_manual_food)
 
     if st.session_state.manual_foods:
-        st.markdown("### 직접 추가한 음식 목록")
+      
         for food in st.session_state.manual_foods:
-            st.markdown(f" **{food}**")
-            cols3 = st.columns(4)
-            for i, meal in enumerate(["아침", "점심", "저녁", "간식"]):
-                if cols3[i].button(f"{meal} 등록", key=f"manual_{food}_{meal}"):
-                    try:
-                        response = requests.post(SERVER_URL, json={"food_name": food, "meal_type": meal}, timeout=5)
-                        if response.status_code == 200:
-                            st.success(f"'{food}'을(를) {meal}에 등록했습니다.")
-                        else:
-                            st.error(f"서버 오류: {response.status_code} - {response.text}")
-                    except requests.exceptions.RequestException as e:
-                        st.error(f"서버 요청 실패: {e}")
+            cols = st.columns([4, 2, 2, 3, 2, 2, 2])
+
+            if st.session_state.get("manual_edit_food") == food:
+                with cols[0]:
+                    st.markdown(f"**{food}**")
+                new_name = cols[1].text_input("새 이름", value=food, key=f"manual_edit_input_{food}")
+                if cols[1].button("저장", key=f"manual_save_btn_{food}"):
+                    idx = st.session_state.manual_foods.index(food)
+                    st.session_state.manual_foods[idx] = new_name
+                    st.session_state.manual_edit_food = None
+                    st.experimental_rerun()
+                cols[1].write("")
+                cols[2].write("")
+            else:
+                with cols[0]:
+                    st.markdown(f"**🍽️ {food}**")
+                if cols[1].button("수정", key=f"manual_edit_btn_{food}"):
+                    st.session_state.manual_edit_food = food
+                if cols[2].button("삭제", key=f"manual_del_btn_{food}"):
+                    st.session_state.manual_foods.remove(food)
+                    if st.session_state.get("manual_edit_food") == food:
+                        st.session_state.manual_edit_food = None
+                    st.experimental_rerun()
+                cols[3].write("")
+
+                for i, meal in enumerate(["아침", "점심", "저녁"]):
+                    if cols[4 + i].button(f"{meal}", key=f"manual_{food}_{meal}"):
+                        try:
+                            response = requests.post(SERVER_URL, json={"food_name": food, "meal_type": meal}, timeout=5)
+                            if response.status_code == 200:
+                                st.success(f"'{food}'을(를) {meal}에 등록했습니다.")
+                            elif response.status_code == 400:
+                                detail = response.json().get("detail", "등록 실패")
+                                st.warning(f"{detail}")  # <-- 이미 등록된 음식입니다 같은 메시지 출력
+                            else:
+                                st.error(f"서버 오류: {response.status_code} - {response.text}")
+                        except requests.exceptions.RequestException as e:
+                            st.error(f"서버 요청 실패: {e}")
+
+if "analyzed_foods" in st.session_state and st.session_state.analyzed_foods:
+    st.write("---")
+
+    if st.button("음식 영양 분석하기", key="analyze"):
+        st.session_state.clear()
+        st.markdown(
+            """
+            <meta http-equiv="refresh" content="0; url='http://13.124.198.232:8501/'" />
+            """,
+            unsafe_allow_html=True
+        )

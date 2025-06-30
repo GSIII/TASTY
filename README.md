@@ -16,13 +16,13 @@
 - Cloud Platform : AWS(EC2)
 - OS: Linux(Ubuntu)
 
-## Deployment
+### Deployment
 - Github Actions
 - Docker
 - Kubernetes
 
 
-## 개발/배포 아키텍처
+## ⚙️ 개발/배포 아키텍처
 ![Image](https://github.com/user-attachments/assets/4e8444a9-e0a1-47ea-b811-019714adcd63)
 
 ### 배포 프로세스

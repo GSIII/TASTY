@@ -21,8 +21,10 @@ cd $DEST/ai
 
 python -m venv .venv
 
-source .venv/bin/activate
+# source .venv/bin/activate
 
-pip install -r requirements.txt
+# pip install -r requirements.txt
+
+./.venv/bin/python -m pip install -r requirements.txt
 
 nohup ./.venv/bin/streamlit run app.py --server.port=8501 > streamlit.log 2>&1 & disown

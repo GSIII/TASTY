@@ -22,5 +22,4 @@ source .venv/bin/activate
 
 pip install -r requirements.txt
 
-nohup streamlit run app.py --server.port=8501 > streamlit.log 2>&1 &
-disown
+nohup setsid streamlit run app.py --server.port=8501 > streamlit.log 2>&1 < /dev/null &

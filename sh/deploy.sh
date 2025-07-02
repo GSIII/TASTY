@@ -23,6 +23,4 @@ source .venv/bin/activate
 pip install -r requirements.txt
 
 nohup streamlit run app.py --server.port=8501 > streamlit.log 2>&1 &
-sleep 3
-echo "Streamlit started. Exiting deploy script."
-exit 0
+disown

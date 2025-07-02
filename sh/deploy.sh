@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# 에러 발생 시 스크립트 중단
+set -e
+
 git pull;
 
 for pid in $(ps -ef | grep streamlit | grep -v grep | awk '{print $2}'); do
@@ -8,7 +11,7 @@ for pid in $(ps -ef | grep streamlit | grep -v grep | awk '{print $2}'); do
 done
 
 SRC=/work/TASTY/ai
-DEST=/$HOME/deploy
+DEST=$HOME/deploy
 
 rm -rf $DEST
 mkdir -p $DEST
@@ -22,4 +25,4 @@ source .venv/bin/activate
 
 pip install -r requirements.txt
 
-nohup setsid streamlit run app.py --server.port=8501 > streamlit.log 2>&1 < /dev/null &
+nohup ./.venv/bin/streamlit run app.py --server.port=8501 > streamlit.log 2>&1 & disown

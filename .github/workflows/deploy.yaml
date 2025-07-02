@@ -15,4 +15,4 @@ jobs:
           script: |
             cd /work/TASTY
             export OPENAI_API_KEY='${{ secrets.OPENAI_API_KEY }}'
-            ./deploy.sh
+            ./sh/deploy.sh

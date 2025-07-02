@@ -27,4 +27,4 @@ python -m venv .venv
 
 ./.venv/bin/python -m pip install -r requirements.txt
 
-nohup ./.venv/bin/streamlit run app.py --server.port=8501 > streamlit.log 2>&1 & disown
+nohup setsid ./.venv/bin/streamlit run app.py --server.port=8501 > streamlit.log 2>&1 &
